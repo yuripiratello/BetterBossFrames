@@ -96,3 +96,12 @@ jobs:
         if: steps.check_tag.outputs.exists == 'true'
         run: |
           echo "⏭️ Release skipped - version v${{ steps.version.outputs.version }} already exists"
+
+      - name: Publish to CurseForge and Wago
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -p ${{ secrets.CURSEFORGE_PROJECT_ID }} -a ${{ secrets.WAGO_PROJECT_ID }}
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
