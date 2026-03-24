@@ -1,0 +1,18 @@
+## Interface: 120000
+## Title: Better Boss Frames
+## Notes: Custom boss frames with cast bars, advanced debuff/buff tracking, and dynamic health coloring. Fully customizable via Edit Mode
+## Author: YuriPiratello
+## Version: 1.3.0
+## SavedVariables: BetterBossFramesDB
+## OptionalDeps: LibStub, LibEditMode
+## X-Category: Interface Enhancements
+## X-Curse-Project-ID: better-boss-frames
+
+# Libraries
+libs\LibStub\LibStub.lua
+libs\LibEditMode\namespaced.lua
+libs\LibEditMode\embed.xml
+
+# Core files
+Core.lua
+BossFrames.lua
