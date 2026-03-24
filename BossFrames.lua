@@ -208,7 +208,9 @@ function BBF:CreateBossFrame(index)
 	frame.castBarContainer.bg:SetAllPoints()
 	frame.castBarContainer.bg:SetColorTexture(0, 0, 0, 0.8)
 
-	frame.castBarContainer:Hide()
+	-- Start shown but invisible - never call Hide(), only use SetAlpha
+	frame.castBarContainer:Show()
+	frame.castBarContainer:SetAlpha(0)
 
 	-- Cast bar StatusBar
 	frame.castBar = CreateFrame("StatusBar", nil, frame.castBarContainer)
@@ -1032,20 +1034,8 @@ function BBF:CastStart(frame, unit)
 		-- Hide time text (cannot display due to secret duration values)
 		frame.castBar.time:SetText("")
 
-		-- Show cast bar container (combat-aware)
-		if InCombatLockdown() then
-			frame.castBarContainer:SetAlpha(1)
-		else
-			-- Use pcall - old frames may still have tainted backdrop
-			local success = pcall(function() frame.castBarContainer:Show() end)
-			if not success then
-				-- Fallback: set alpha and remove backdrop if it exists
-				frame.castBarContainer:SetAlpha(1)
-				if frame.castBarContainer.SetBackdrop then
-					pcall(function() frame.castBarContainer:SetBackdrop(nil) end)
-				end
-			end
-		end
+		-- Show cast bar container (only use SetAlpha to avoid backdrop taint)
+		frame.castBarContainer:SetAlpha(1)
 	end
 end
 
@@ -1112,20 +1102,8 @@ function BBF:CastChannel(frame, unit)
 		-- Hide time text (cannot display due to secret duration values)
 		frame.castBar.time:SetText("")
 
-		-- Show cast bar container (combat-aware)
-		if InCombatLockdown() then
-			frame.castBarContainer:SetAlpha(1)
-		else
-			-- Use pcall - old frames may still have tainted backdrop
-			local success = pcall(function() frame.castBarContainer:Show() end)
-			if not success then
-				-- Fallback: set alpha and remove backdrop if it exists
-				frame.castBarContainer:SetAlpha(1)
-				if frame.castBarContainer.SetBackdrop then
-					pcall(function() frame.castBarContainer:SetBackdrop(nil) end)
-				end
-			end
-		end
+		-- Show cast bar container (only use SetAlpha to avoid backdrop taint)
+		frame.castBarContainer:SetAlpha(1)
 	end
 end
 
@@ -1137,12 +1115,8 @@ function BBF:CastStop(frame)
 	frame.castBar.channeling = false
 	frame.castBar.spellID = nil
 
-	-- Hide cast bar container (combat-aware to avoid backdrop taint)
-	if InCombatLockdown() then
-		frame.castBarContainer:SetAlpha(0)
-	else
-		frame.castBarContainer:Hide()
-	end
+	-- Hide cast bar container (only use SetAlpha to avoid backdrop taint)
+	frame.castBarContainer:SetAlpha(0)
 end
 
 -- Cast failed/interrupted

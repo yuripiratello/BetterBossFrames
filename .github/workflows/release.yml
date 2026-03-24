@@ -1,0 +1,97 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from TOC
+        id: version
+        run: |
+          VERSION=$(grep "## Version:" BetterBossFrames.toc | sed 's/## Version: //')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.version.outputs.version }} already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.version.outputs.version }} does not exist, will create release"
+          fi
+
+      - name: Package addon
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          mkdir -p release/BetterBossFrames
+
+          # Copy addon files
+          cp -r libs release/BetterBossFrames/
+          cp BetterBossFrames.toc release/BetterBossFrames/
+          cp Core.lua release/BetterBossFrames/
+          cp BossFrames.lua release/BetterBossFrames/
+
+          # Create zip
+          cd release
+          zip -r BetterBossFrames-v${{ steps.version.outputs.version }}.zip BetterBossFrames/
+          cd ..
+
+      - name: Read changelog
+        if: steps.check_tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          # Extract latest changes from README.md
+          CHANGELOG=$(awk '/## Version ${{ steps.version.outputs.version }}/{flag=1; next} /## Version [0-9]/{flag=0} flag' README.md || echo "No changelog available")
+
+          # If changelog is empty, provide a default message
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="Release version ${{ steps.version.outputs.version }}"
+          fi
+
+          # Save to file to handle multiline properly
+          echo "$CHANGELOG" > /tmp/changelog.txt
+
+          # Set output
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/changelog.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Better Boss Frames v${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: release/BetterBossFrames-v${{ steps.version.outputs.version }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release created
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          echo "✅ Release v${{ steps.version.outputs.version }} created successfully!"
+          echo "Download: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}"
+
+      - name: Release skipped
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "⏭️ Release skipped - version v${{ steps.version.outputs.version }} already exists"
