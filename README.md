@@ -214,7 +214,14 @@ If you encounter any issues or have suggestions, please open an issue on the Git
 
 ## Changelog
 
-### Version 1.3.0 (Current) - Cast Bars & Proper Secret Values Handling
+### Version 1.3.1 (Current) - Backdrop Taint Fix
+- 🐛 **CRITICAL FIX**: Fixed backdrop taint error when frames shown after combat
+- 🐛 **Fixed**: Replaced BackdropTemplate with manual texture-based borders to prevent taint
+- 🐛 **Fixed**: Error "attempt to perform arithmetic on local 'width' (a secret number value)"
+- ✨ **Improved**: Frame borders and cast bar icon borders now use manual textures
+- 🔧 **Code**: Avoids Blizzard_SharedXML/Backdrop.lua coordinate calculations on tainted dimensions
+
+### Version 1.3.0 - Cast Bars & Proper Secret Values Handling
 - ✨ **NEW**: Cast bars for boss spell casts
   - Shows spell icon, name, and remaining cast time
   - Orange bars for regular casts, blue for channeled spells
