@@ -84,14 +84,45 @@ function BBF:CreateBossFrame(index)
 	frame.bg:SetAllPoints()
 	frame.bg:SetColorTexture(0, 0, 0, 0)
 
-	-- Border (normal state)
-	frame.border = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	-- Border (normal state) - Manual textures to avoid taint
+	frame.border = CreateFrame("Frame", nil, frame)
 	frame.border:SetAllPoints()
-	frame.border:SetBackdrop({
-		edgeFile = "Interface\\Buttons\\WHITE8x8",
-		edgeSize = 2,
-	})
-	frame.border:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+
+	local borderSize = 2
+	local borderColor = {0.3, 0.3, 0.3, 1}
+
+	-- Create 4 edge textures
+	frame.border.top = frame.border:CreateTexture(nil, "BORDER")
+	frame.border.top:SetColorTexture(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
+	frame.border.top:SetPoint("TOPLEFT", 0, 0)
+	frame.border.top:SetPoint("TOPRIGHT", 0, 0)
+	frame.border.top:SetHeight(borderSize)
+
+	frame.border.bottom = frame.border:CreateTexture(nil, "BORDER")
+	frame.border.bottom:SetColorTexture(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
+	frame.border.bottom:SetPoint("BOTTOMLEFT", 0, 0)
+	frame.border.bottom:SetPoint("BOTTOMRIGHT", 0, 0)
+	frame.border.bottom:SetHeight(borderSize)
+
+	frame.border.left = frame.border:CreateTexture(nil, "BORDER")
+	frame.border.left:SetColorTexture(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
+	frame.border.left:SetPoint("TOPLEFT", 0, 0)
+	frame.border.left:SetPoint("BOTTOMLEFT", 0, 0)
+	frame.border.left:SetWidth(borderSize)
+
+	frame.border.right = frame.border:CreateTexture(nil, "BORDER")
+	frame.border.right:SetColorTexture(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
+	frame.border.right:SetPoint("TOPRIGHT", 0, 0)
+	frame.border.right:SetPoint("BOTTOMRIGHT", 0, 0)
+	frame.border.right:SetWidth(borderSize)
+
+	-- Helper function to set border color
+	frame.border.SetBackdropBorderColor = function(self, r, g, b, a)
+		self.top:SetColorTexture(r, g, b, a)
+		self.bottom:SetColorTexture(r, g, b, a)
+		self.left:SetColorTexture(r, g, b, a)
+		self.right:SetColorTexture(r, g, b, a)
+	end
 
 	-- Health bar (positioned in middle of frame)
 	frame.healthBar = CreateFrame("StatusBar", nil, frame)
@@ -240,15 +271,37 @@ function BBF:CreateBossFrame(index)
 	frame.castBar.icon:SetPoint("RIGHT", frame.castBarContainer, "LEFT", -2, 0)
 	frame.castBar.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
-	-- Cast bar icon border
-	frame.castBar.iconBorder = CreateFrame("Frame", nil, frame.castBarContainer, "BackdropTemplate")
+	-- Cast bar icon border - Manual textures to avoid taint
+	frame.castBar.iconBorder = CreateFrame("Frame", nil, frame.castBarContainer)
 	frame.castBar.iconBorder:SetPoint("TOPLEFT", frame.castBar.icon, "TOPLEFT", -1, 1)
 	frame.castBar.iconBorder:SetPoint("BOTTOMRIGHT", frame.castBar.icon, "BOTTOMRIGHT", 1, -1)
-	frame.castBar.iconBorder:SetBackdrop({
-		edgeFile = "Interface\\Buttons\\WHITE8x8",
-		edgeSize = 1,
-	})
-	frame.castBar.iconBorder:SetBackdropBorderColor(0, 0, 0, 1)
+
+	local iconBorderSize = 1
+
+	-- Create 4 edge textures for icon border
+	frame.castBar.iconBorder.top = frame.castBar.iconBorder:CreateTexture(nil, "BORDER")
+	frame.castBar.iconBorder.top:SetColorTexture(0, 0, 0, 1)
+	frame.castBar.iconBorder.top:SetPoint("TOPLEFT", 0, 0)
+	frame.castBar.iconBorder.top:SetPoint("TOPRIGHT", 0, 0)
+	frame.castBar.iconBorder.top:SetHeight(iconBorderSize)
+
+	frame.castBar.iconBorder.bottom = frame.castBar.iconBorder:CreateTexture(nil, "BORDER")
+	frame.castBar.iconBorder.bottom:SetColorTexture(0, 0, 0, 1)
+	frame.castBar.iconBorder.bottom:SetPoint("BOTTOMLEFT", 0, 0)
+	frame.castBar.iconBorder.bottom:SetPoint("BOTTOMRIGHT", 0, 0)
+	frame.castBar.iconBorder.bottom:SetHeight(iconBorderSize)
+
+	frame.castBar.iconBorder.left = frame.castBar.iconBorder:CreateTexture(nil, "BORDER")
+	frame.castBar.iconBorder.left:SetColorTexture(0, 0, 0, 1)
+	frame.castBar.iconBorder.left:SetPoint("TOPLEFT", 0, 0)
+	frame.castBar.iconBorder.left:SetPoint("BOTTOMLEFT", 0, 0)
+	frame.castBar.iconBorder.left:SetWidth(iconBorderSize)
+
+	frame.castBar.iconBorder.right = frame.castBar.iconBorder:CreateTexture(nil, "BORDER")
+	frame.castBar.iconBorder.right:SetColorTexture(0, 0, 0, 1)
+	frame.castBar.iconBorder.right:SetPoint("TOPRIGHT", 0, 0)
+	frame.castBar.iconBorder.right:SetPoint("BOTTOMRIGHT", 0, 0)
+	frame.castBar.iconBorder.right:SetWidth(iconBorderSize)
 
 	-- Spell name text
 	frame.castBar.text = frame.castBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
